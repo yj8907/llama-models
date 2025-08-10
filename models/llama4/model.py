@@ -18,6 +18,8 @@ from fairscale.nn.model_parallel.layers import (
 )
 from torch import nn
 
+from llama_models.llama4.moc import MemoryBank
+
 from .args import ModelArgs
 from .datatypes import TransformerInput, TransformerOutput
 from .ffn import FeedForward
@@ -281,6 +283,16 @@ class TransformerBlock(nn.Module):
                 dim=args.dim,
                 hidden_dim=hidden_dim,
             )
+        
+        if args.moc_args and (layer_id + 1) % args.moc_args.interleave_moc_layer_step == 0:
+            context_forward = MemoryBank(
+                dim=args.dim,
+                memory_size=args.moc_args.memory_size,
+                tokens_per_memory=args.moc_args.tokens_per_memory,
+                top_k=args.moc_args.top_k
+            )
+            self.feed_forward = torch.nn.Sequential(context_forward, self.feed_forward)
+            
         self.layer_id = layer_id
         self.attention_norm = RMSNorm(args.dim, eps=args.norm_eps)
         self.ffn_norm = RMSNorm(args.dim, eps=args.norm_eps)
@@ -386,7 +398,7 @@ class Transformer(nn.Module):
         if prefix + "rope.freqs" in state_dict:
             state_dict.pop(prefix + "rope.freqs")
 
-    @torch.inference_mode()
+    # @torch.inference_mode()
     def forward(self, model_input: TransformerInput) -> TransformerOutput:
         tokens = model_input.tokens
         start_pos = model_input.tokens_position

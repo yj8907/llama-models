@@ -35,6 +35,15 @@ class MoEArgs(BaseModel):
     top_k: int = 1
     interleave_moe_layer_step: int = 1
 
+class MoCArgs(BaseModel):
+    memory_size: int = -1
+    tokens_per_memory: int = 256
+    capacity_factor: float = 1.0  # capacity factor determines how many tokens each expert can choose
+    auto_scale_F: bool = (  # noqa: N815
+        True  # if true, rescales hidden_dim such that number of activated params is same as equivalent dense layer
+    )
+    top_k: int = 1
+    interleave_moc_layer_step: int = 1
 
 class Size(BaseModel):
     height: int
@@ -83,6 +92,7 @@ class ModelArgs(BaseModel):
 
     vision_args: Optional[VisionArgs] = None
     moe_args: Optional[MoEArgs] = None
+    moc_args: Optional[MoCArgs] = None
     quantization_args: Optional[QuantizationArgs] = None
     lora_args: Optional[LoRAArgs] = None
 
