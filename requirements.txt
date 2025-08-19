@@ -17,7 +17,7 @@ typing-extensions==4.12.2
 urllib3==2.3.0
 notebook
 deepspeed==0.13.1
-box==3.1.2
+python-box
 lightning==2.3.1
 numpy==1.26.1
 Pillow==11.1.0
