@@ -1,0 +1,8 @@
+#install NVIDIA driver 
+sudo yum update -y   # if using Amazon Linux
+# Or: sudo apt update && sudo apt upgrade -y  # if Ubuntu
+
+# Install NVIDIA driver
+curl -O https://us.download.nvidia.com/tesla/535.183.01/NVIDIA-Linux-x86_64-535.183.01.run
+chmod +x NVIDIA-Linux-x86_64-535.183.01.run
+sudo ./NVIDIA-Linux-x86_64-535.183.01.run
